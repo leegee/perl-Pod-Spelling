@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 package Pod::Spelling;
-our $VERSION = 0.6; # Catch undefined
+our $VERSION = 0.7;
 
 use Pod::POM;
 
@@ -90,7 +90,7 @@ sub _spell_check_callback {
 	warnings::warnif( 
 		'No spell_check_callback registered: no spell checking is happening!'
 	);
-	# Return all words as errors
+	# Return all mispelt words. Since no spell checker, that means all intput words 
 	return split /\s+/, join "\n", @_;	
 }
 
@@ -99,7 +99,7 @@ sub _clean_text {
 	my ($self, $text) = @_;
 	return '' if not $text;
 	
-	$text =~ s/(\w+::)+\w+/ /gs;	# Remove references to Perl modules
+	$text =~ s/(\w+::)+\w+/ /gs;	    # Remove references to Perl modules
 	$text =~ s/\s+/ /gs;
 	$text =~ s/[()\@,;:"\/.]+/ /gs;		# Remove punctuation
 	

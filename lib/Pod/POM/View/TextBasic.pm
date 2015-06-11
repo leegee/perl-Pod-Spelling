@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use utf8;
 
 package Pod::POM::View::TextBasic;
 our $VERSION = 0.1;
