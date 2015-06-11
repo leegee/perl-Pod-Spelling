@@ -13,23 +13,23 @@ Test::Pod::Spelling - A Test library to spell-check POD files
 
 =head1 SYNOPSIS
 
-	use Test::Pod::Spelling;
-	all_pod_files_spelling_ok();
-	add_stopwords(qw( Goddard inine ));
-	done_testing();
+    use Test::Pod::Spelling;
+    all_pod_files_spelling_ok();
+    add_stopwords(qw( Goddard inine ));
+    done_testing();
 
-	use Test::Pod::Spelling (
-		spelling => {
-				allow_words => [qw[ 
-					Goddard LICENCE inline behaviour spelt
-				]]
-			},
-		);
-	};
-	pod_file_spelling_ok( 't/good.pod' );
-	all_pod_files_spelling_ok();
-	done_testing();
-	
+    use Test::Pod::Spelling (
+        spelling => {
+                allow_words => [qw[ 
+                    Goddard LICENCE inline behaviour spelt
+                ]]
+            },
+        );
+    };
+    pod_file_spelling_ok( 't/good.pod' );
+    all_pod_files_spelling_ok();
+    done_testing();
+    
 =head1 DESCRIPTION
 
 This module exports two routines, described below, to test POD for spelling errors,
@@ -52,8 +52,8 @@ applied, though, if required.
 =cut
 
 use base qw( 
-	Test::Builder::Module 
-	Exporter 
+    Test::Builder::Module 
+    Exporter 
 );
 
 my $CLASS = __PACKAGE__;
@@ -76,8 +76,8 @@ $Test->{_skip_files} = {};
 
 =head1 EXPORTS
 
-	all_pod_files_spelling_ok() 
-	pod_file_spelling_ok() 
+    all_pod_files_spelling_ok() 
+    pod_file_spelling_ok() 
 
 =cut
 
@@ -88,31 +88,31 @@ sub import {
     
     # Get the spelling argument:
     for my $i (0..$#args){
-    	if ($args[$i] and $args[$i] eq 'spelling'){
-    		confess 'During import, the "spelling" argument must point to a HASH or Pod::Spelling object'
-    			if $i==$#args
-    			or not ref($args[$i+1]) 
-    			or ref($args[$i+1]) !~ /^(HASH|Pod::Spelling.*)$/; 
-    		# Use to init obj later
-    		$spelling_args = $args[$i+1];
-			# Remove from args that will be passed to plan()
-    		@args = @args[
-				0..$i-1,
-				$i+2 .. $#args
-			];
-    	}
-    	if ($args[$i] and $args[$i] eq 'skip'){
-    		confess 'During import, the "skip" argument must point to an ARRAY'
-    			if $i==$#args
-    			or not ref($args[$i+1]) 
-    			or ref($args[$i+1]) ne 'ARRAY'; 
-    		$Test->{_skip_files} = { map {$_=>1} $args[$i+1] };
-			# Remove from args that will be passed to plan()
-    		@args = @args[
-				0..$i-1,
-				$i+2 .. $#args
-			];
-		}
+        if ($args[$i] and $args[$i] eq 'spelling'){
+            confess 'During import, the "spelling" argument must point to a HASH or Pod::Spelling object'
+                if $i==$#args
+                or not ref($args[$i+1]) 
+                or ref($args[$i+1]) !~ /^(HASH|Pod::Spelling.*)$/; 
+            # Use to init obj later
+            $spelling_args = $args[$i+1];
+            # Remove from args that will be passed to plan()
+            @args = @args[
+                0..$i-1,
+                $i+2 .. $#args
+            ];
+        }
+        if ($args[$i] and $args[$i] eq 'skip'){
+            confess 'During import, the "skip" argument must point to an ARRAY'
+                if $i==$#args
+                or not ref($args[$i+1]) 
+                or ref($args[$i+1]) ne 'ARRAY'; 
+            $Test->{_skip_files} = { map {$_=>1} $args[$i+1] };
+            # Remove from args that will be passed to plan()
+            @args = @args[
+                0..$i-1,
+                $i+2 .. $#args
+            ];
+        }
     }
     
     $Test->{_speller} = Pod::Spelling->new( $spelling_args );
@@ -120,9 +120,9 @@ sub import {
     my $caller = caller;
 
     for my $func ( qw(
-		add_stopwords all_pod_files_spelling_ok pod_file_spelling_ok
-		skip_paths_matching
-	)) {
+        add_stopwords all_pod_files_spelling_ok pod_file_spelling_ok
+        skip_paths_matching
+    )) {
         no strict 'refs';
         *{$caller."::".$func} = \&$func;
     }
@@ -141,19 +141,19 @@ expressions to skip any file paths they match.
 =cut
 
 sub skip_paths_matching {
-	my @res = @_;
+    my @res = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-	my $rv = 1;
-	# Make sure they are regex
-	foreach my $i (@res){
-		if (not ref $i or ref $i ne 'Regexp'){
-			$rv = 0;
-		}
-		else {
-			$Test->{_speller}->skip_paths_matching( $i );
-		}
-	}
-	return $rv;
+    my $rv = 1;
+    # Make sure they are regex
+    foreach my $i (@res){
+        if (not ref $i or ref $i ne 'Regexp'){
+            $rv = 0;
+        }
+        else {
+            $Test->{_speller}->skip_paths_matching( $i );
+        }
+    }
+    return $rv;
 }
 
 =head2 C<all_pod_files_spelling_ok( [@entries] )>
@@ -165,24 +165,24 @@ to check the spelling of POD files.
 =cut
 
 sub all_pod_files_spelling_ok {
-	my @args = @_ ? @_ : Test::Pod::_starting_points();
+    my @args = @_ ? @_ : Test::Pod::_starting_points();
     my @paths = map { -d $_ ? Test::Pod::all_pod_files($_) : $_ } @args;
     my @errors;
     
     PATH:
-	foreach my $path (@paths){
-		foreach my $re ($Test->{_speller}->skip_paths_matching){
-			if ($path =~ $re){
-				$Test->skip("path $path because of skip_paths_matching $re");
-				next PATH;
-			}
-		}
-    	push @errors, pod_file_spelling_ok( $path );
+    foreach my $path (@paths){
+        foreach my $re ($Test->{_speller}->skip_paths_matching){
+            if ($path =~ $re){
+                $Test->skip("path $path because of skip_paths_matching $re");
+                next PATH;
+            }
+        }
+        push @errors, pod_file_spelling_ok( $path );
     }
 
     return keys %{{
-    	map {$_=>1} grep {defined} @errors
-	}};
+        map {$_=>1} grep {defined} @errors
+    }};
 }
 
 =head2 C<pod_file_spelling_ok( FILENAME[, TESTNAME ] )>
@@ -193,49 +193,49 @@ except that it checks the spelling of POD files.
 =cut
 
 sub pod_file_spelling_ok {
-	my ($path, $name) = @_;
-	return () if exists $Test->{_skip_files}->{$path};
-	
-	# All good POD has =head1 NAME\n\n$TITLE - $DESCRIPTION
-	# so add that title to the dictionary. It may be a script name
-	# without colons, so using the module name or path is not enough.
-	open my $IN, $path or confess 'Could not open '.$path;
-	read $IN, my $file, -s $IN;
-	close $IN;
-	my ($pod_name) = $file =~ /^=head1\s+NAME[\n\r\f]+\s*(\S+)\s*-\s*/m;
-	undef $file;	
-	
-	if ($pod_name){
-		my @words = $pod_name =~ s/:+/ /g;
-		$Test->{_speller}->add_allow_words(
-			$pod_name,
-			split(/\s+/, @words)
-		);
-	}
-	
-	if (not $name){
-		$name = 'POD spelling test for '. ( $pod_name || $path );
-	}
-	
-	my @errors = $Test->{_speller}->check_file( $path );
+    my ($path, $name) = @_;
+    return () if exists $Test->{_skip_files}->{$path};
+    
+    # All good POD has =head1 NAME\n\n$TITLE - $DESCRIPTION
+    # so add that title to the dictionary. It may be a script name
+    # without colons, so using the module name or path is not enough.
+    open my $IN, $path or confess 'Could not open '.$path;
+    read $IN, my $file, -s $IN;
+    close $IN;
+    my ($pod_name) = $file =~ /^=head1\s+NAME[\n\r\f]+\s*(\S+)\s*-\s*/m;
+    undef $file;    
+    
+    if ($pod_name){
+        my @words = $pod_name =~ s/:+/ /g;
+        $Test->{_speller}->add_allow_words(
+            $pod_name,
+            split(/\s+/, @words)
+        );
+    }
+    
+    if (not $name){
+        $name = 'POD spelling test for '. ( $pod_name || $path );
+    }
+    
+    my @errors = $Test->{_speller}->check_file( $path );
 
-	$Test->ok( not( scalar @errors), $name );
+    $Test->ok( not( scalar @errors), $name );
 
-	if (@errors){
-		foreach my $line ( 0 .. $#{ $Test->{_speller}->{errors} }){
-			my $misspelt = $Test->{_speller}->{errors}->[$line];
-			if ($misspelt and scalar @$misspelt){
-				$Test->diag( sprintf
-					'  Unknown word%s in %s (POD line %d): %s.',
-					(scalar @$misspelt==1? '':'s'),
-					$path, ($line+1), 
-					join ', ', map("\"$_\"", @$misspelt)
-				);
-			}
-		}
-	}
-	
-	return @errors;
+    if (@errors){
+        foreach my $line ( 0 .. $#{ $Test->{_speller}->{errors} }){
+            my $misspelt = $Test->{_speller}->{errors}->[$line];
+            if ($misspelt and scalar @$misspelt){
+                $Test->diag( sprintf
+                    '  Unknown word%s in %s (POD line %d): %s.',
+                    (scalar @$misspelt==1? '':'s'),
+                    $path, ($line+1), 
+                    join ', ', map("\"$_\"", @$misspelt)
+                );
+            }
+        }
+    }
+
+    return @errors;
 }
 
 =head2 add_stopwords( @words )
@@ -245,8 +245,8 @@ Adds a list of stop-words to those already being used by the spell-checker.
 =cut
 
 sub add_stopwords {
-	$Test->{_speller}->add_allow_words( @_ );
-	return 1;
+    $Test->{_speller}->add_allow_words( @_ );
+    return 1;
 }
 
 1;
