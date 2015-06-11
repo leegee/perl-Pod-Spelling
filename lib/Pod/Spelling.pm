@@ -102,6 +102,7 @@ sub _clean_text {
 	$text =~ s/(\w+::)+\w+/ /gs;	    # Remove references to Perl modules
 	$text =~ s/\s+/ /gs;
 	$text =~ s/[()\@,;:"\/.]+/ /gs;		# Remove punctuation
+	$text =~ s/\d+//gs;					# Remove numbers
 	
 	foreach my $word ( @{$self->{allow_words}} ){
 		next if not defined $word;
