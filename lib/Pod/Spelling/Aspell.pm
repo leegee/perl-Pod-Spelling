@@ -1,6 +1,5 @@
 use strict;
 use warnings;
-use utf8;
 
 package Pod::Spelling::Aspell;
 use base 'Pod::Spelling';

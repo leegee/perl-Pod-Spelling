@@ -116,6 +116,7 @@ _STOP_
 		'Pod::POM'	=> 0.04,
 		'Test::Pod' => 0,
 		'Test::Builder' => 0,
+		'Test::Pod'	=> 0,
 	  },
 	  dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	  clean => { FILES    => 'Pod-Spelling-*' },

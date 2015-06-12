@@ -4,20 +4,18 @@ my $VERSION = 2;
 
 # Copyright (C) Lee Goddard 2001 ff. All Rights Reserved.
 
-use lib qw(../lib . t/);
+use lib 'lib';
 use ExtUtils::testlib;
 use ExtUtils::Manifest;
 use Cwd;
 use Data::Dumper;
 use Test::More tests => 3;
 
-chdir ".." if getcwd =~ /\Wt$/;
-
 # ExtUtils::Manifest::mkmanifest();
 
 my ($missing, $extra) = ExtUtils::Manifest::fullcheck();
 
-@_ = grep {*\.t$/} @$missing;
+@_ = grep {/\.t$/} @$missing;
 is( scalar(@_), 0, 'No tests missing from manifest') or &list('missing',@_);
 
 @_ = grep {/\.pm$/} @$missing;

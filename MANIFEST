@@ -1,17 +1,19 @@
-LICENSE
-cpanfile
 Changes
+cpanfile
 lib/Pod/POM/View/TextBasic.pm
 lib/Pod/Spelling.pm
 lib/Pod/Spelling/Aspell.pm
 lib/Pod/Spelling/Ispell.pm
 lib/Test/Pod/Spelling.pm
+LICENSE
 MANIFEST			This list of files
 MANIFEST.skip
 Makefile.PL
 t/bad.pod
 t/good.pod
 t/manifest.t
+t/numbers.pod
+t/one.pod
 t/pod_format.t
 t/pod_spelling_aispell.t
 t/pod_spelling_base.t

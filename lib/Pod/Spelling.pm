@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 package Pod::Spelling;
-our $VERSION = 0.7;
+our $VERSION = 0.6; # Catch undefined
 
 use Pod::POM;
 
@@ -27,14 +27,14 @@ sub new {
 	$self->{skip_paths_matching} ||= [];
 
 	# Allow a single word to be allowed:
-	if ($self->{allow_words}){
-		$self->{allow_words} = [$self->{allow_words}] if not ref $self->{allow_words};
-	}		
+	if ($self->{allow_words} and not ref $self->{allow_words}){
+		$self->{allow_words} = [ $self->{allow_words} ];
+	}
 
-	if ($self->{not_pod_wordlist}){
+	unless ($self->{not_pod_wordlist}){
 		eval { 
 			no warnings;
-			require Pod::Wordlist 
+			require Pod::Wordlist ;
 		};
 		warnings::warnif( $@ );
 	}
@@ -90,7 +90,7 @@ sub _spell_check_callback {
 	warnings::warnif( 
 		'No spell_check_callback registered: no spell checking is happening!'
 	);
-	# Return all mispelt words. Since no spell checker, that means all intput words 
+	# Return all words as errors
 	return split /\s+/, join "\n", @_;	
 }
 
@@ -99,17 +99,20 @@ sub _clean_text {
 	my ($self, $text) = @_;
 	return '' if not $text;
 	
-	$text =~ s/(\w+::)+\w+/ /gs;	    # Remove references to Perl modules
+	$text =~ s/(\w+::)+\w+/ /gs;	# Remove references to Perl modules
 	$text =~ s/\s+/ /gs;
 	$text =~ s/[()\@,;:"\/.]+/ /gs;		# Remove punctuation
-	$text =~ s/\d+//gs;					# Remove numbers
+	$text =~ s/\d+//sg;
+	$text =~ s/["'](\w+)["']/$1/sg;
+	$text =~ s/\b-(\w+)/ $1/sg;
+	$text =~ s/(\w+)-\b/$1 /sg;
 	
 	foreach my $word ( @{$self->{allow_words}} ){
 		next if not defined $word;
-		$text =~ s/\b\Q$word\E\b//g;
+		$text =~ s/\b\Q$word\E\b//sig;
 	}
 
-	unless (exists $self->{no_pod_wordlist}){
+	unless (exists $self->{no_pod_wordlist} or exists $self->{no_pod_wordlist}){
 		no warnings 'once';
 		foreach my $word (split /\s+/, $text){
 			$word = '' if exists $Pod::Wordlist::Wordlist->{$word};
@@ -120,7 +123,7 @@ sub _clean_text {
 	# which were thought errors: easier than parsing
 	# Perl, for now:
 	$text =~ s/(\w+_\w+||_\w+||\w_)//sg;
-	
+
 	return $text;
 }
 
@@ -141,15 +144,15 @@ sub check_file {
 		open my $IN, $path or confess "$! - $path";
 		read $IN, my $content, -s $IN;
 		close $IN;
+
 		my @packages = grep {length} $content =~ /^([}{;]+||)\s*package\s+([a-z](?:[\w]+||::)*?)\s*[;{]/img;
-		$packages = { map {$_=>1} @packages };
+
 		$self->add_allow_words(
 			@packages,				# Whole package names
-			keys %{{				# Parts of package names
-				map {$_=>1} map {
-					split /::/, $_
-				} @packages
-			}}
+			# Parts of package names
+			map {
+				split /::/, $_
+			} @packages
 		);
 	}
 		
@@ -316,7 +319,7 @@ represents a line in the file, and thus may be empty if there are no spelling er
 
 =head2 add_allow_words
 
-Add a list of words to the 'allow' list specified at constrution.
+Add a list of words to the 'allow' list specified at instantiation.
 
 =head2 skip_paths_matching
 

@@ -42,9 +42,9 @@ isa_ok( $o, 'Pod::Spelling') or BAIL_OUT "";
 
 diag getcwd();
 
-$rv = $o->check_file( 't/good.pod' );
-ok( $rv, 'default dummy callback')
-	or die Dumper $rv;
+my @rv = $o->check_file( 't/good.pod' );
+ok( not(@rv), 'default dummy callback')
+	or diag join', ', @rv;
 
 $o = Pod::Spelling->new( use_pod_wordlist => 1, );
 

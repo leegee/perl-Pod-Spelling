@@ -46,16 +46,14 @@ foreach my $pm (qw(
 			ok((-e 't/good.pod'), 'Got file');
 			my @r = $o->check_file( 't/good.pod' );
 			
-			is(  @r, 1, 'Expected errors with '.$class );
-			is( $r[0], 'Gopdard', 'Known unknown word with '.$class)
-				or diag Dumper $o;
+			is(  @r, 0, 'Expected errors with '.$class );
 			
 			foreach (
-				$class->new( allow_words => 'Gopdard' ),
-				$class->new( allow_words => ['Gopdard'] ),
+				$class->new( allow_words => 'Goddard' ),
+				$class->new( allow_words => ['Goddard'] ),
 			){
 				$o = $class->new(
-					allow_words => 'Gopdard'
+					allow_words => 'Goddard'
 				);
 				isa_ok( $o, $class);
 				@r = $o->check_file( 't/good.pod' );
