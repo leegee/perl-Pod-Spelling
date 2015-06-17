@@ -1,4 +1,12 @@
 CHANGES
+
+0.23 2015-06-17
+	Added support for `=for stopwords` and `=for spelling` 
+	and `=for allowed_words`.
+
+0.22 2015-06-*
+	Various bug fixes and a bit of a tidy-up
+
 0.17 2013-04-04
 	Added skip_paths_matching()
 	Fixed index error
