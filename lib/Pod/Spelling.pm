@@ -173,7 +173,7 @@ sub check_file {
 	my $line = 0;
 	foreach my $node ($pom->content){
 
-		if ($node->type() eq 'for'){
+		if ($node->type() =~ /^(begin|for)$/){
 			my $allowed_line = $node->present( $self->{view} );
 			my @stoplist = split /\s/, $allowed_line;
 			$self->_add_temporary_stoplist( @stoplist );

@@ -8,8 +8,12 @@ use base 'Pod::POM::View::Text';
 
 our $DROPS = 1;
 
-sub view_for { 
-    my ($format, $text) = $_[1] =~ /^\s*\=for\s+(\S+)\s+(.*?)\s*$/si;
+sub view_for { return maybe_stopwords(@_); }
+
+sub view_begin { return maybe_stopwords(@_); }
+
+sub maybe_stopwords {
+    my ($format, $text) = $_[1] =~ /^\s*\=\w+\s+(\S+)\s+(.*?)\s*$/si;
     $text =~ s/\s+/ /g;
     return $format =~ /^(stopwords?|spelling|allow|allow_words|allowed_words)$/gi? $text : '';
 }
