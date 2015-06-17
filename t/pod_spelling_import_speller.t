@@ -55,13 +55,13 @@ foreach my $pm (qw(
 			);
 
 			TODO: {
-				use Data::Dumper;
+				require Data::Dumper;
 				local $TODO = 'pending' if $o->{aspell};
 				is(
 					$o->check_file( 't/good.pod' ),
-					1,
+					0,
 					'One expected error'
-				) or warn Dumper $o;
+				) or warn Data::Dumper::Dumper $o;
 			}
 		}
 	}

@@ -36,7 +36,7 @@ sub new {
 			no warnings;
 			require Pod::Wordlist ;
 		};
-		warnings::warnif( $@ );
+		warnings::warnif( $@ ) if $@;
 	}
 	
 	if (ref $self and $self->{import_speller}){
