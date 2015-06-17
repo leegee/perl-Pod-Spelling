@@ -22,6 +22,7 @@ sub new {
 	my $self = bless {
 		%$args,
 		_parser => Pod::POM->new,
+		_temp_stoplist => [],
 	}, $class;
 	
 	$self->{skip_paths_matching} ||= [];
@@ -174,7 +175,8 @@ sub check_file {
 
 		if ($node->type() eq 'for'){
 			my $allowed_line = $node->present( $self->{view} );
-			$self->add_allow_words( split /\s/, $allowed_line );
+			my @stoplist = split /\s/, $allowed_line;
+			$self->add_temporary_stoplist( @stoplist );
 			next;
 		}
 
@@ -212,6 +214,8 @@ sub check_file {
 		$line ++;
 	}
 
+	$self->remove_temporary_stoplist;
+
 	return @rv;
 }
 
@@ -224,6 +228,27 @@ sub skip_paths_matching {
 	my $self = shift;
 	push @{ $self->{skip_paths_matching} }, @_ if $#_ > -1;
 	return @{ $self->{skip_paths_matching} };
+}
+
+sub add_temporary_stoplist {
+	my ($self, @stoplist) = @_;
+	my $dict = { map {$_=>1} @{$self->{allow_words}} };
+	my @new;
+	foreach my $word (@stoplist){
+		push @new, $word if not exists $dict->{$word};
+	}
+	push @{ $self->{_temp_stoplist} }, \@new;
+	$self->add_allow_words( @new );
+}
+
+sub remove_temporary_stoplist {
+	my ($self, @stoplist) = @_;
+	$self->add_allow_words( @stoplist );
+	my $remove = { map {$_=>1} pop @{ $self->{_temp_stoplist} } };
+	my @allowed;
+	foreach my $word (@{ $self->{allow_words} }){
+		push @allowed, $word if not exists $remove->{$word};
+	}
 }
 
 1;
