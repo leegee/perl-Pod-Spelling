@@ -14,8 +14,8 @@ Test::Pod::Spelling - A Test library to spell-check POD files
 =head1 SYNOPSIS
 
 	use Test::Pod::Spelling;
+    add_stopwords(qw( Goddard inine ));
 	all_pod_files_spelling_ok();
-	add_stopwords(qw( Goddard inine ));
 	done_testing();
 
 	use Test::Pod::Spelling (
