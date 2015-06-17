@@ -176,7 +176,7 @@ sub check_file {
 		if ($node->type() eq 'for'){
 			my $allowed_line = $node->present( $self->{view} );
 			my @stoplist = split /\s/, $allowed_line;
-			$self->add_temporary_stoplist( @stoplist );
+			$self->_add_temporary_stoplist( @stoplist );
 			next;
 		}
 
@@ -214,7 +214,7 @@ sub check_file {
 		$line ++;
 	}
 
-	$self->remove_temporary_stoplist;
+	$self->_remove_temporary_stoplist;
 
 	return @rv;
 }
@@ -230,7 +230,7 @@ sub skip_paths_matching {
 	return @{ $self->{skip_paths_matching} };
 }
 
-sub add_temporary_stoplist {
+sub _add_temporary_stoplist {
 	my ($self, @stoplist) = @_;
 	my $dict = { map {$_=>1} @{$self->{allow_words}} };
 	my @new;
@@ -241,9 +241,9 @@ sub add_temporary_stoplist {
 	$self->add_allow_words( @new );
 }
 
-sub remove_temporary_stoplist {
+sub _remove_temporary_stoplist {
 	my ($self, @stoplist) = @_;
-	$self->add_allow_words( @stoplist );
+	return if not scalar @{ $self->{_temp_stoplist} };
 	my $remove = { map {$_=>1} pop @{ $self->{_temp_stoplist} } };
 	my @allowed;
 	foreach my $word (@{ $self->{allow_words} }){

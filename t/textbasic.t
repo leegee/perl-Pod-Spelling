@@ -6,11 +6,14 @@ use Pod::POM;
 
 BEGIN {
 	use lib 'lib';
-	use_ok('Pod::POM::View::TextBasic');
+	use Pod::POM::View::TextBasic;
 }
 
-Pod::POM->default_view( 'Pod::POM::View::TextBasic' )
-	or fail $Pod::POM::ERROR;
+{
+    no warnings 'once';
+    Pod::POM->default_view( 'Pod::POM::View::TextBasic' )
+    	or fail $Pod::POM::ERROR;
+}
 
 my $p = Pod::POM->new( warn => 1 );
 

@@ -10,11 +10,13 @@ MANIFEST			This list of files
 MANIFEST.skip
 Makefile.PL
 t/bad.pod
+t/for.pod
 t/good.pod
 t/manifest.t
 t/numbers.pod
 t/one.pod
 t/pod_coverage.t
+t/pod_for.t
 t/pod_format.t
 t/pod_spelling_aispell.t
 t/pod_spelling_base.t
