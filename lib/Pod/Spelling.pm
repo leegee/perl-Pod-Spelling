@@ -6,7 +6,7 @@ package Pod::Spelling;
 our $VERSION = 0.6; # Catch undefined
 
 use Pod::POM;
-
+require Pod::POM::View::TextBasic;
 use warnings::register;
 use Carp;
 
@@ -16,15 +16,17 @@ sub new {
 		(ref($_[0])? shift : {@_})
 	);
 
-	Pod::POM->default_view( 'Pod::POM::View::TextBasic' )
-		or confess $Pod::POM::ERROR;
-	
+	# Pod::POM->default_view( 'Pod::POM::View::TextBasic' )
+	# 	or confess $Pod::POM::ERROR;
+
 	my $self = bless {
 		%$args,
 		_parser => Pod::POM->new,
 	}, $class;
 	
 	$self->{skip_paths_matching} ||= [];
+
+	$self->{view} ||= 'Pod::POM::View::TextBasic';
 
 	# Allow a single word to be allowed:
 	if ($self->{allow_words} and not ref $self->{allow_words}){
@@ -141,6 +143,7 @@ sub check_file {
 
 	# Crude test to allow package names:
 	{
+		# Hope it is not too large.
 		open my $IN, $path or confess "$! - $path";
 		read $IN, my $content, -s $IN;
 		close $IN;
@@ -155,6 +158,11 @@ sub check_file {
 			} @packages
 		);
 	}
+
+	# To support '=for stopwords', we could create yet another parser, 
+	# and reparse the document, but not sure why that would be better
+	# than this:
+
 		
     my $pom = $self->{_parser}->parse_file($path)
     	or confess $self->{_parser}->error();
@@ -162,7 +170,17 @@ sub check_file {
 	my $code = $self->{spell_check_callback};
 	
 	my $line = 0;
-	foreach my $text ( split/[\n\r\f]+/, scalar $pom->content()) {
+	foreach my $node ($pom->content){
+
+		if ($node->type() eq 'for'){
+			my $allowed_line = $node->present( $self->{view} );
+			$self->add_allow_words( split /\s/, $allowed_line );
+			next;
+		}
+
+		my $text = $node->present( $self->{view} );
+		$text =~ s/[\n\r\f]+/ /sg;
+
 		$text = $self->_clean_text( $text );
 		my @err = $self->$code( $text );
 		

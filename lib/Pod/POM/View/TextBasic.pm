@@ -2,11 +2,17 @@ use strict;
 use warnings;
 
 package Pod::POM::View::TextBasic;
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 use base 'Pod::POM::View::Text';
 
 our $DROPS = 1;
+
+sub view_for { 
+    my ($format, $text) = $_[1] =~ /^\s*\=for\s+(\S+)\s+(.*?)\s*$/si;
+    $text =~ s/\s+/ /g;
+    return $format =~ /^(stopwords?|spelling|allow|allow_words|allowed_words)$/gi? $text : '';
+}
 
 sub view_seq_bold { return $_[1]; }
 
