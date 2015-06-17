@@ -7,7 +7,75 @@ use Data::Dumper;
 my $ok;
 my @errors;
 
-{
+if (not $ok){
+	eval "require Text::Hunspell";
+	if ($@){
+		push @errors, 'No Text::Hunspell';
+	} 
+	
+	else {
+		my $path;
+		FIND: 
+		foreach my $p (
+			'', # Already on the PATH?
+			qw( 
+				/usr/local/bin/
+				/usr/local/sbin/
+				/usr/bin/
+				/opt/usr/bin/
+				/opt/local/bin/
+			)
+		){
+			$path = $p . ($^O eq 'MSWin32'? 'hunspell.exe' : 'hunspell');
+			if (`$path -v`){
+				no warnings;
+				$Lingua::Ispell::path = $path;
+				$ok = 1;
+				last FIND;
+			}
+			push @errors, "Could not find hunspell on path $path";
+		}
+		
+		if ($ok){
+			$ok = undef;
+
+			my ($affix, $dic);
+			FIND: 
+			foreach my $dir (
+				qw( 
+					/usr/share/hunspell
+					/usr/local/share/hunspell
+					/opt/usr/share/hunspell
+					/opt/local/share/hunspell
+				)
+			){
+				foreach my $lang (qw( hu_HU en_GB en_US )){
+					$affix = "$dir/$lang.aff";
+					$dic   = "$dir/$lang.dic";
+					if (-e $affix and -e $dic){
+						$ok = 1;
+						last FIND;
+					}
+					push @errors, "Could not find aff and dic in $dir";
+				}
+			}
+
+			my $r = Text::Hunspell->new($affix, $dic);
+			if (not ref $r) {
+				push @errors, "Hunspellp->new($affix, $dic) failed to return an object";
+			}
+			elsif (not $r->check('house')){
+				push @errors, "Hunspell could not spell 'house'";
+			} 
+			else {
+				$ok = 1;
+				@errors = ();
+			}
+		}
+	}
+}
+
+if (not $ok){
 	eval "require Text::Aspell";
 	if ($@){
 		push(@errors, "No Text::Aspell installed");
@@ -79,15 +147,18 @@ if (not $ok){
 	}
 }
 
+
 if (not $ok){
 	print <<_STOP_;
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 This module  requires you  have  installed  on your system
-one of either Lingua::Ispell or  Text::Aspell Perl modules,
-along with their binaries, and that they are configured to 
-function correctly: it appears this is not the case.
+one of the following Perl modules and their binaries:
+
+	Text::Hunspell
+    Lingua::Ispell
+    Text::Aspell
 
 If you feel this  message to be  in  error, please contact
 the author via LGoddard-at-CPAN-dot-org.
@@ -103,7 +174,6 @@ _STOP_
 # else 
 {
 	
-	
 	WriteMakefile(
 	  # ( MM->can( 'signature_target' ) ? ( SIGN => 1 ) : () ),
 	  license( 'perl' ),
@@ -116,7 +186,6 @@ _STOP_
 		'Pod::POM'	=> 0.04,
 		'Test::Pod' => 0,
 		'Test::Builder' => 0,
-		'Test::Pod'	=> 0,
 	  },
 	  dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	  clean => { FILES    => 'Pod-Spelling-*' },

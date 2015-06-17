@@ -391,6 +391,9 @@ C<Pod::Spelling::Ispell>.
 
 =head1 SEE ALSO
 
+L<Test::Pod::Spelling>,
+L<Pod::Spelling::Hunspell>,
+L<Pod::Spelling::Aspell>,
 L<Pod::Spelling::Ispell>,
 L<Pod::POM>,
 L<Pod::POM::View::TextBasic>,

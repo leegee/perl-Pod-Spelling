@@ -19,7 +19,7 @@ sub _init {
 		
 	$self->{aspell}->check('house');
 	return $self->{aspell}->errstr if $self->{aspell}->errstr;
-	Carp::croak $self if not ref $self;
+
 	return $self;
 }
 
@@ -65,7 +65,7 @@ L<Pod::Spelling|Pod::Spelling>.
 
 =head1 SEE ALSO
 
-L<Pod::Spelling>, L<Text::Aspell>.
+L<Pod::Spelling>, L<Test::Pod::Spelling>.
 
 =head1 AUTHOR
 
