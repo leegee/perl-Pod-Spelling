@@ -7,8 +7,19 @@ plan to use the API to provide your own spell-checker.
 
 ## INSTALLATION
 
+Install a spelling module, one of:
+
+    cpanm Text::Hunspell
+    cpanm Lingua::Ispell
+    cpanm Text::Aspell
+
+Install this module:
+
+    cpanm Pod::Spelling
+
+Or download, extract, and run:
+
 	perl Makefile.PL
 	make
 	make test
 	sudo make install
-	
