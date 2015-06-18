@@ -25,8 +25,7 @@ sub _init {
 
 # Accepts one or more lines of text, returns a list mispelt words.
 sub _spell_check_callback {
-	my $self = shift;
-	my @lines = @_;
+	my ($self, @lines) = @_;
 	my $errors;
 	for my $word ( split /\s+/, join( ' ', @lines ) ){
 		next if not $word;

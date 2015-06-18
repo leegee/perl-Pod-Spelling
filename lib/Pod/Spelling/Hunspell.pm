@@ -105,15 +105,14 @@ sub _init {
 
 # Accepts one or more lines of text, returns a list mispelt words.
 sub _spell_check_callback {
-	my $self = shift;
-	my @lines = @_;
+	my ($self, @lines) = @_;
 	my $errors;
-	
-	foreach my $line (@lines){
-		foreach my $word (split /\s+/, $word){
-			if (not $self->{hunspell}->check($word)){
-				$errors->{ $word } ++;
-			}
+
+	for my $word ( split /\s+/, join( ' ', @lines ) ){
+		next if not $word;
+		if (not $self->{hunspell}->check($word)){
+			warn 'ERROR '.$word;
+			$errors->{ $word } ++;
 		}
 	}
 	

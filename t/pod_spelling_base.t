@@ -8,22 +8,20 @@ use Cwd;
 use lib 'lib';
 
 BEGIN {
-	my $no_pm;
-	eval { require Lingua::Ispell };
+	eval { require Text::Hunspell };
 	if ($@){
-		eval { 
-			require Text::Aspell;
-			my $o = Text::Aspell->new;
-			$o->check('house');
-			die $o->errstr if $o->errstr;
-		};
-	}
-	if ($@){
-		plan skip_all => 'requires Lingua::Ispell or Text::Aspell' ; 
-		$no_pm ++;
-	}
-	if (!$no_pm) {
-		plan tests => 8;
+		eval { require Lingua::Ispell };
+		if ($@){
+			eval { 
+				require Text::Aspell;
+				my $o = Text::Aspell->new;
+				$o->check('house');
+				die $o->errstr if $o->errstr;
+			};
+		}
+		if ($@){
+			plan skip_all => 'requires Lingua::Ispell or Text::Aspell' ; 
+		}
 	}
 }
 

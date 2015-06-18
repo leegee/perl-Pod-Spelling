@@ -104,11 +104,12 @@ sub _clean_text {
 	
 	$text =~ s/(\w+::)+\w+/ /gs;	# Remove references to Perl modules
 	$text =~ s/\s+/ /gs;
-	$text =~ s/[()\@,;:"\/.]+/ /gs;		# Remove punctuation
+	$text =~ s/[^\w-]+/ /gs;		# Remove punctuation
 	$text =~ s/\d+//sg;
 	$text =~ s/["'](\w+)["']/$1/sg;
 	$text =~ s/\b-(\w+)/ $1/sg;
 	$text =~ s/(\w+)-\b/$1 /sg;
+	$text =~ s/\s+\W\s+/ /sg;
 	
 	foreach my $word ( @{$self->{allow_words}} ){
 		next if not defined $word;
