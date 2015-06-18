@@ -110,8 +110,9 @@ sub _spell_check_callback {
 
 	for my $word ( split /\s+/, join( ' ', @lines ) ){
 		next if not $word;
+		next if length $word < 2;
+
 		if (not $self->{hunspell}->check($word)){
-			warn 'ERROR '.$word;
 			$errors->{ $word } ++;
 		}
 	}

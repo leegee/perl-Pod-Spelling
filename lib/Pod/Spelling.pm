@@ -34,10 +34,11 @@ sub new {
 		$self->{allow_words} = [ $self->{allow_words} ];
 	}
 
+	$Pod::Wordlist::Wordlist = {};
 	unless ($self->{not_pod_wordlist}){
 		eval { 
 			no warnings;
-			require Pod::Wordlist ;
+			require Pod::Wordlist;
 		};
 		warnings::warnif( $@ ) if $@;
 	}
@@ -110,6 +111,7 @@ sub _clean_text {
 	$text =~ s/\b-(\w+)/ $1/sg;
 	$text =~ s/(\w+)-\b/$1 /sg;
 	$text =~ s/\s+\W\s+/ /sg;
+	$text =~ s/\bPerl\b/ /sg;
 	
 	foreach my $word ( @{$self->{allow_words}} ){
 		next if not defined $word;
