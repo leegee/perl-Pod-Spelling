@@ -7,7 +7,9 @@ use Data::Dumper;
 my $ok;
 my @errors;
 
-if (not $ok){
+use lib qw( lib );
+
+{
 	eval "require Text::Hunspell";
 	if ($@){
 		push @errors, 'No Text::Hunspell';
@@ -16,61 +18,14 @@ if (not $ok){
 	else {
 		my $path;
 		FIND: 
-		foreach my $p (
-			'', # Already on the PATH?
-			qw( 
-				/usr/local/bin/
-				/usr/local/sbin/
-				/usr/bin/
-				/opt/usr/bin/
-				/opt/local/bin/
-			)
-		){
-			$path = $p . ($^O eq 'MSWin32'? 'hunspell.exe' : 'hunspell');
-			if (`$path -v`){
-				no warnings;
-				$Lingua::Ispell::path = $path;
-				$ok = 1;
-				last FIND;
-			}
-			push @errors, "Could not find hunspell on path $path";
-		}
-		
-		if ($ok){
-			$ok = undef;
+		$ok = undef;
 
-			my ($affix, $dic);
-			FIND: 
-			foreach my $dir (
-				qw( 
-					/usr/share/hunspell
-					/usr/local/share/hunspell
-					/opt/usr/share/hunspell
-					/opt/local/share/hunspell
-				)
-			){
-				foreach my $lang (qw( hu_HU en_GB en_US )){
-					$affix = "$dir/$lang.aff";
-					$dic   = "$dir/$lang.dic";
-					if (-e $affix and -e $dic){
-						$ok = 1;
-						last FIND;
-					}
-					push @errors, "Could not find aff and dic in $dir";
-				}
-			}
-
-			my $r = Text::Hunspell->new($affix, $dic);
-			if (not ref $r) {
-				push @errors, "Hunspellp->new($affix, $dic) failed to return an object";
-			}
-			elsif (not $r->check('house')){
-				push @errors, "Hunspell could not spell 'house'";
-			} 
-			else {
-				$ok = 1;
-				@errors = ();
-			}
+		require Pod::Spelling::Hunspell;
+		eval { Pod::Spelling::Hunspell->_init };
+		if ($@){
+			push @errors, $@;
+		} else {
+			$ok = 1;
 		}
 	}
 }
