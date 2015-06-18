@@ -5,20 +5,22 @@ use Test::More;
 use lib 'lib';
 
 BEGIN {
-	eval { require Lingua::Ispell };
+	eval { require Text::Hunspell };
 	if ($@){
-		eval { 
-			require Text::Aspell;
-			my $o = Text::Aspell->new;
-			$o->check('house');
-			die $o->errstr if $o->errstr;
-		};
-	}
-	if ($@){
-		plan skip_all => 'requires Lingua::Ispell or Text::Aspell' ; 
+		eval { require Lingua::Ispell };
+		if ($@){
+			eval { 
+				require Text::Aspell;
+				my $o = Text::Aspell->new;
+				$o->check('house');
+				die $o->errstr if $o->errstr;
+			};
+		}
+		if ($@){
+			plan skip_all => 'requires Lingua::Ispell or Text::Aspell' ; 
+		}
 	}
 }
-
 
 BEGIN {
 	use_ok('Pod::Spelling');

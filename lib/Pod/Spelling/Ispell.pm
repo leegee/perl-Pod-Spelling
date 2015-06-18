@@ -85,7 +85,7 @@ L<Pod::Spelling|Pod::Spelling>.
 
 =head1 SEE ALSO
 
-L<Pod::Spelling>, L<Lingua::Ispell>.
+L<Pod::Spelling>, L<Test::Pod::Spelling>, L<Lingua::Ispell>.
 
 =head1 AUTHOR
 

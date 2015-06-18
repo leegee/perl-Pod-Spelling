@@ -34,10 +34,11 @@ sub new {
 		$self->{allow_words} = [ $self->{allow_words} ];
 	}
 
+	$Pod::Wordlist::Wordlist = {};
 	unless ($self->{not_pod_wordlist}){
 		eval { 
 			no warnings;
-			require Pod::Wordlist ;
+			require Pod::Wordlist;
 		};
 		warnings::warnif( $@ ) if $@;
 	}
@@ -50,14 +51,14 @@ sub new {
 	# try to find one of the defaults.	
 	else {
 		if (not $self->{spell_check_callback}){
-			foreach my $mod (qw( Ispell Aspell )){
+			foreach my $mod (qw( Hunspell Ispell Aspell )){
 				last if $self->import_speller( 'Pod::Spelling::'.$mod );
 			}
 		}
 		$self = $self->_init;
 	}
 
-	Carp::confess 'Could not instantiate any spell checker. Do you have Ispell or Aspell installed with dictionaries?'
+	Carp::confess 'Could not instantiate any spell checker. Do you have Hunspell, Ispell or Aspell installed with dictionaries?'
 		if not $self->{spell_check_callback};
 
 	return $self;
@@ -104,11 +105,13 @@ sub _clean_text {
 	
 	$text =~ s/(\w+::)+\w+/ /gs;	# Remove references to Perl modules
 	$text =~ s/\s+/ /gs;
-	$text =~ s/[()\@,;:"\/.]+/ /gs;		# Remove punctuation
+	$text =~ s/[^\w-]+/ /gs;		# Remove punctuation
 	$text =~ s/\d+//sg;
 	$text =~ s/["'](\w+)["']/$1/sg;
 	$text =~ s/\b-(\w+)/ $1/sg;
 	$text =~ s/(\w+)-\b/$1 /sg;
+	$text =~ s/\s+\W\s+/ /sg;
+	$text =~ s/\bPerl\b/ /sg;
 	
 	foreach my $word ( @{$self->{allow_words}} ){
 		next if not defined $word;
@@ -280,8 +283,9 @@ Pod::Spelling - Send POD to a spelling checker
 
 This module provides extensible spell-checking of POD.
 
-At present, it requires either L<Lingua::Ispell> or L<Text::Aspell>,
-one of which  must be installed on your system, with its binaries, 
+At present, it checks for (in order) one of L<Text::Hunspell>, 
+L<Lingua::Ispell> or L<Text::Aspell>,
+one of which must be installed on your system, with its binaries, 
 unless you plan to use the API to provide your own spell-checker. In
 the latter case, or if binaries are missing from their default locations,
 expect test failures.
@@ -391,6 +395,9 @@ C<Pod::Spelling::Ispell>.
 
 =head1 SEE ALSO
 
+L<Test::Pod::Spelling>,
+L<Pod::Spelling::Hunspell>,
+L<Pod::Spelling::Aspell>,
 L<Pod::Spelling::Ispell>,
 L<Pod::POM>,
 L<Pod::POM::View::TextBasic>,

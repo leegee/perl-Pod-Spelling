@@ -7,7 +7,30 @@ use Data::Dumper;
 my $ok;
 my @errors;
 
+use lib qw( lib );
+
 {
+	eval "require Text::Hunspell";
+	if ($@){
+		push @errors, 'No Text::Hunspell';
+	} 
+	
+	else {
+		my $path;
+		FIND: 
+		$ok = undef;
+
+		require Pod::Spelling::Hunspell;
+		eval { Pod::Spelling::Hunspell->_init };
+		if ($@){
+			push @errors, $@;
+		} else {
+			$ok = 1;
+		}
+	}
+}
+
+if (not $ok){
 	eval "require Text::Aspell";
 	if ($@){
 		push(@errors, "No Text::Aspell installed");
@@ -79,15 +102,18 @@ if (not $ok){
 	}
 }
 
+
 if (not $ok){
 	print <<_STOP_;
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 This module  requires you  have  installed  on your system
-one of either Lingua::Ispell or  Text::Aspell Perl modules,
-along with their binaries, and that they are configured to 
-function correctly: it appears this is not the case.
+one of the following Perl modules and their binaries:
+
+	Text::Hunspell
+    Lingua::Ispell
+    Text::Aspell
 
 If you feel this  message to be  in  error, please contact
 the author via LGoddard-at-CPAN-dot-org.
@@ -103,7 +129,6 @@ _STOP_
 # else 
 {
 	
-	
 	WriteMakefile(
 	  # ( MM->can( 'signature_target' ) ? ( SIGN => 1 ) : () ),
 	  license( 'perl' ),
@@ -116,7 +141,6 @@ _STOP_
 		'Pod::POM'	=> 0.04,
 		'Test::Pod' => 0,
 		'Test::Builder' => 0,
-		'Test::Pod'	=> 0,
 	  },
 	  dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	  clean => { FILES    => 'Pod-Spelling-*' },

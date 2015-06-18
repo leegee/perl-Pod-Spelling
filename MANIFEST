@@ -3,6 +3,7 @@ cpanfile
 lib/Pod/POM/View/TextBasic.pm
 lib/Pod/Spelling.pm
 lib/Pod/Spelling/Aspell.pm
+lib/Pod/Spelling/Hunspell.pm
 lib/Pod/Spelling/Ispell.pm
 lib/Test/Pod/Spelling.pm
 LICENSE
@@ -18,7 +19,7 @@ t/one.pod
 t/pod_coverage.t
 t/pod_for.t
 t/pod_format.t
-t/pod_spelling_aispell.t
+t/pod_spelling_modules.t
 t/pod_spelling_base.t
 t/pod_spelling_base_cb.t
 t/pod_spelling_import_speller.t

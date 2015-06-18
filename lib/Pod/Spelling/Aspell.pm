@@ -19,14 +19,13 @@ sub _init {
 		
 	$self->{aspell}->check('house');
 	return $self->{aspell}->errstr if $self->{aspell}->errstr;
-	Carp::croak $self if not ref $self;
+
 	return $self;
 }
 
 # Accepts one or more lines of text, returns a list mispelt words.
 sub _spell_check_callback {
-	my $self = shift;
-	my @lines = @_;
+	my ($self, @lines) = @_;
 	my $errors;
 	for my $word ( split /\s+/, join( ' ', @lines ) ){
 		next if not $word;
@@ -65,7 +64,7 @@ L<Pod::Spelling|Pod::Spelling>.
 
 =head1 SEE ALSO
 
-L<Pod::Spelling>, L<Text::Aspell>.
+L<Pod::Spelling>, L<Test::Pod::Spelling>.
 
 =head1 AUTHOR
 
